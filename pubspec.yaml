@@ -1,6 +1,6 @@
 name: mahafez_design_system
 description: Layer 1 Design System & UI Primitives for Mahafez Platform (Cairo typography, AppColors, AppSpacing, AppResponsive, UI primitives).
-version: 1.0.1
+version: 1.0.2
 repository: https://github.com/mahafez-app/mahafez_design_system
 publish_to: 'none'
 

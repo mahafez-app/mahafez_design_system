@@ -66,4 +66,14 @@ abstract final class MahafezColors {
   static const Color onInverseSurface = Color(0xFFF8FAFC);
   static const Color inversePrimary = Color(0xFF93C5FD);
   static const Color surfaceTint = Color(0xFF0058BE);
+
+  // ── Wallet provider brands (always fixed) ─────────────────────────────────
+  static const Color vodafoneRed = Color(0xFFE60000);
+  static const Color orangeMoney = Color(0xFFFF7900);
+  static const Color etisalatGreen = Color(0xFF7CB342);
+  static const Color instaPayNavy = Color(0xFF9B51E0);
+  static const Color wePayPurple = Color(0xFF5D1D50);
+  static const Color fawryYellow = Color(0xFFFACC15);
+  static const Color bankSlate = Color(0xFF64748B);
+  static const Color providerUnknownNeutral = Color(0xFF94A3B8);
 }
