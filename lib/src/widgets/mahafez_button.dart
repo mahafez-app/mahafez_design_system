@@ -30,79 +30,94 @@ class MahafezButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDisabled = onPressed == null || isLoading;
 
-    final resolvedBg =
-        backgroundColor ??
-        switch (type) {
-          .primary => theme.colorScheme.primary,
-          .secondary => theme.colorScheme.secondaryContainer,
-          .tertiary => Colors.transparent,
-        };
+    final Color indicatorColor = switch (type) {
+      .primary =>
+        backgroundColor != null
+            ? theme.colorScheme.onSurface
+            : theme.colorScheme.onPrimary,
+      .secondary ||
+      .tertiary => foregroundColor ?? theme.colorScheme.primary,
+    };
 
-    final resolvedFg =
-        foregroundColor ??
-        switch (type) {
-          .primary => theme.colorScheme.onPrimary,
-          .secondary => theme.colorScheme.onSecondaryContainer,
-          .tertiary => theme.colorScheme.primary,
-        };
-
-    final content = Row(
-      mainAxisAlignment: .center,
-      mainAxisSize: .min,
-      children: [
-        if (isLoading) ...[
-          SizedBox(
-            width: 20.responsiveWidth,
-            height: 20.responsiveHeight,
+    final Widget child = isLoading
+        ? SizedBox.square(
+            dimension: 20.responsiveWidth,
             child: CircularProgressIndicator(
-              strokeWidth: 2,
-              valueColor: AlwaysStoppedAnimation(resolvedFg),
+              strokeWidth: 2.5.responsiveWidth,
+              valueColor: AlwaysStoppedAnimation<Color>(indicatorColor),
             ),
-          ),
-          MahafezSpacing.sm.horizontalSpace,
-        ] else if (icon != null) ...[
-          IconTheme(
-            data: IconThemeData(color: resolvedFg, size: 20.responsiveRadius),
-            child: icon!,
-          ),
-          MahafezSpacing.sm.horizontalSpace,
-        ],
-        Text(
-          label,
-          style: theme.textTheme.labelLarge?.copyWith(
-            color: resolvedFg,
-            fontWeight: .w700,
-          ),
-        ),
-        if (trailingIcon != null && !isLoading) ...[
-          MahafezSpacing.sm.horizontalSpace,
-          IconTheme(
-            data: IconThemeData(color: resolvedFg, size: 20.responsiveRadius),
-            child: trailingIcon!,
-          ),
-        ],
-      ],
-    );
+          )
+        : trailingIcon != null
+        ? Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(label, textAlign: TextAlign.center),
+              MahafezSpacing.sm.horizontalSpace,
+              trailingIcon!,
+            ],
+          )
+        : Text(label, textAlign: TextAlign.center);
 
-    return SizedBox(
-      width: double.infinity,
-      height: 56.responsiveHeight,
-      child: FilledButton(
-        onPressed: isLoading ? null : onPressed,
-        style: FilledButton.styleFrom(
-          backgroundColor: resolvedBg,
-          foregroundColor: resolvedFg,
-          elevation: 0,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16.responsiveRadius),
-            side: type == .tertiary
-                ? BorderSide(color: theme.colorScheme.outlineVariant)
-                : BorderSide.none,
-          ),
+    final ButtonStyle? customStyle =
+        foregroundColor != null || backgroundColor != null
+        ? switch (type) {
+            .primary => FilledButton.styleFrom(
+              foregroundColor: foregroundColor,
+              backgroundColor: backgroundColor,
+            ),
+            .secondary => OutlinedButton.styleFrom(
+              foregroundColor: foregroundColor,
+              backgroundColor: backgroundColor,
+            ),
+            .tertiary => TextButton.styleFrom(
+              foregroundColor: foregroundColor,
+              backgroundColor: backgroundColor,
+            ),
+          }
+        : null;
+
+    if (icon != null && !isLoading) {
+      return switch (type) {
+        .primary => FilledButton.icon(
+          onPressed: isDisabled ? null : onPressed,
+          style: customStyle,
+          icon: icon!,
+          label: child,
         ),
-        child: content,
+        .secondary => OutlinedButton.icon(
+          onPressed: isDisabled ? null : onPressed,
+          style: customStyle,
+          icon: icon!,
+          label: child,
+        ),
+        .tertiary => TextButton.icon(
+          onPressed: isDisabled ? null : onPressed,
+          style: customStyle,
+          icon: icon!,
+          label: child,
+        ),
+      };
+    }
+
+    return switch (type) {
+      .primary => FilledButton(
+        onPressed: isDisabled ? null : onPressed,
+        style: customStyle,
+        child: child,
       ),
-    );
+      .secondary => OutlinedButton(
+        onPressed: isDisabled ? null : onPressed,
+        style: customStyle,
+        child: child,
+      ),
+      .tertiary => TextButton(
+        onPressed: isDisabled ? null : onPressed,
+        style: customStyle,
+        child: child,
+      ),
+    };
   }
 }

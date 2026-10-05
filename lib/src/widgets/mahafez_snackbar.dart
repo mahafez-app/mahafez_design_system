@@ -9,6 +9,26 @@ enum MahafezSnackbarType { success, error, info, warning }
 class MahafezSnackbar {
   const MahafezSnackbar._();
 
+  static void Function(BuildContext context, Object failure, Duration duration)?
+      failureHandler;
+
+  static void showFailure(
+    BuildContext context, {
+    required Object failure,
+    Duration duration = const Duration(seconds: 4),
+  }) {
+    if (failureHandler != null) {
+      failureHandler!(context, failure, duration);
+    } else {
+      show(
+        context,
+        message: failure.toString(),
+        type: .error,
+        duration: duration,
+      );
+    }
+  }
+
   static void show(
     BuildContext context, {
     required String message,
@@ -25,55 +45,66 @@ class MahafezSnackbar {
         Icons.check_circle_rounded,
       ),
       .error => (
-        theme.colorScheme.errorContainer,
-        theme.colorScheme.error,
-        Icons.error_outline_rounded,
+        colors.dangerContainer,
+        colors.danger,
+        Icons.error_rounded,
       ),
       .warning => (
         colors.warningContainer,
         colors.warning,
-        Icons.warning_amber_rounded,
+        Icons.warning_rounded,
       ),
-      .info => (colors.infoContainer, colors.info, Icons.info_outline_rounded),
+      .info => (
+        colors.infoContainer,
+        colors.info,
+        Icons.info_rounded,
+      ),
     };
 
-    final messenger = ScaffoldMessenger.of(context);
-    messenger.hideCurrentSnackBar();
-    messenger.showSnackBar(
+    ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         duration: duration,
+        behavior: SnackBarBehavior.floating,
         backgroundColor: Colors.transparent,
         elevation: 0,
-        behavior: .floating,
-        margin: MahafezResponsive.allPadding(MahafezSpacing.lg),
-        padding: .zero,
         content: Container(
           padding: MahafezResponsive.symmetricPadding(
-            horizontal: MahafezSpacing.lg,
-            vertical: MahafezSpacing.md,
+            horizontal: MahafezSpacing.md,
+            vertical: MahafezSpacing.sm,
           ),
           decoration: BoxDecoration(
-            color: backgroundColor,
-            borderRadius: .circular(16.responsiveRadius),
-            border: .all(color: foregroundColor.withAlpha(40), width: 1),
+            color: theme.colorScheme.surface,
+            borderRadius: BorderRadius.circular(16.responsiveRadius),
+            border: Border.all(color: backgroundColor, width: 1.5),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withAlpha(15),
-                blurRadius: 12,
-                offset: const Offset(0, 4),
+                color: colors.cardShadow,
+                blurRadius: 12.responsiveRadius,
+                offset: Offset(0, 4.responsiveHeight),
               ),
             ],
           ),
           child: Row(
             children: [
-              Icon(icon, color: foregroundColor, size: 20.responsiveRadius),
+              Container(
+                padding: MahafezResponsive.allPadding(MahafezSpacing.xs),
+                decoration: BoxDecoration(
+                  color: backgroundColor.withAlpha(50),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  icon,
+                  color: foregroundColor,
+                  size: 20.responsiveRadius,
+                ),
+              ),
               MahafezSpacing.md.horizontalSpace,
               Expanded(
                 child: Text(
                   message,
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: theme.colorScheme.onSurface,
-                    fontWeight: .w600,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
               ),

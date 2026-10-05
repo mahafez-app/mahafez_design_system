@@ -4,28 +4,45 @@ import '../tokens/mahafez_responsive.dart';
 import '../tokens/mahafez_spacing.dart';
 import 'mahafez_button.dart';
 
-/// Standard primitive error view widget for error states.
 class MahafezErrorView extends StatelessWidget {
   const MahafezErrorView({
     super.key,
-    required this.message,
+    this.message,
+    this.error,
     this.onRetry,
-    this.retryLabel = 'Retry',
-  });
+    this.retryLabel,
+  }) : assert(
+          message != null || error != null,
+          'Either message or error must be provided',
+        );
 
-  final String message;
+  final String? message;
+  final Object? error;
   final VoidCallback? onRetry;
-  final String retryLabel;
+  final String? retryLabel;
+
+  static String Function(BuildContext context, Object error)? errorHandler;
+  static String Function(BuildContext context)? retryLabelHandler;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
+    final resolvedMessage = message ??
+        (errorHandler != null && error != null
+            ? errorHandler!(context, error!)
+            : error?.toString() ?? 'Unknown error');
+
+    final resolvedRetryLabel = retryLabel ??
+        (retryLabelHandler != null
+            ? retryLabelHandler!(context)
+            : 'Retry');
+
     return Center(
       child: Padding(
         padding: MahafezResponsive.allPadding(MahafezSpacing.xxl),
         child: Column(
-          mainAxisSize: .min,
+          mainAxisSize: MainAxisSize.min,
           children: [
             Container(
               padding: MahafezResponsive.allPadding(MahafezSpacing.xl),
@@ -35,11 +52,11 @@ class MahafezErrorView extends StatelessWidget {
                     theme.colorScheme.error.withAlpha(40),
                     theme.colorScheme.error.withAlpha(10),
                   ],
-                  begin: .topLeft,
-                  end: .bottomRight,
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
                 ),
-                shape: .circle,
-                border: .all(
+                shape: BoxShape.circle,
+                border: Border.all(
                   color: theme.colorScheme.error.withAlpha(50),
                   width: 1,
                 ),
@@ -52,7 +69,7 @@ class MahafezErrorView extends StatelessWidget {
             ),
             MahafezSpacing.xl.verticalSpace,
             Text(
-              message,
+              resolvedMessage,
               textAlign: TextAlign.center,
               style: theme.textTheme.titleMedium?.copyWith(
                 color: theme.colorScheme.onSurface,
@@ -63,7 +80,7 @@ class MahafezErrorView extends StatelessWidget {
             if (onRetry != null) ...[
               MahafezSpacing.xxl.verticalSpace,
               MahafezButton(
-                label: retryLabel,
+                label: resolvedRetryLabel,
                 icon: const Icon(Icons.refresh_rounded),
                 onPressed: onRetry!,
               ),

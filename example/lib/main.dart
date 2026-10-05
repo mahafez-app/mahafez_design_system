@@ -148,7 +148,11 @@ class GalleryHomeScreen extends StatelessWidget {
             MahafezSpacing.md.verticalSpace,
             Row(
               children: [
-                const MahafezSkeletonBox(width: 80, height: 80, borderRadius: 16),
+                MahafezSkeletonBox(
+                  width: 80,
+                  height: 80,
+                  borderRadius: BorderRadius.circular(16),
+                ),
                 MahafezSpacing.md.horizontalSpace,
                 const MahafezSkeletonBox.circular(size: 60),
                 MahafezSpacing.md.horizontalSpace,
